@@ -159,9 +159,6 @@ describe('Checkbox', () => {
       mount(<Checkbox disabled onClick={spy} />).simulate('click')
       spy.should.not.have.been.called()
     })
-  })
-
-  describe('onMouseDown', () => {
     it('sets focus to container', () => {
       const mountNode = document.createElement('div')
       document.body.appendChild(mountNode)
@@ -169,11 +166,27 @@ describe('Checkbox', () => {
       const wrapper = mount(<Checkbox />, { attachTo: mountNode })
       const input = document.querySelector('.ui.checkbox input')
 
-      wrapper.simulate('mousedown')
+      wrapper.simulate('click')
       document.activeElement.should.equal(input)
 
       wrapper.detach()
       document.body.removeChild(mountNode)
+    })
+  })
+
+  describe('onMouseDown', () => {
+    it('is called with (event { name, value, checked }) on label mouse down', () => {
+      const onMousedDown = sandbox.spy()
+      const expectProps = { name: 'foo', value: 'bar', checked: false, indeterminate: true }
+      mount(<Checkbox onMouseDown={onMousedDown} {...expectProps} />)
+        .simulate('mousedown')
+
+      onMousedDown.should.have.been.calledOnce()
+      onMousedDown.should.have.been.calledWithMatch({}, {
+        ...expectProps,
+        checked: expectProps.checked,
+        indeterminate: expectProps.indeterminate,
+      })
     })
   })
 
